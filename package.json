@@ -1,0 +1,25 @@
+{
+  "name": "oswald",
+  "version": "1.0.0",
+  "description": "Oswald! A Utility and Moderation Discord Bot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omgdahale/oswald.git"
+  },
+  "author": {
+    "name": "Om Dahale",
+    "email": "om.g.dahale@gmail.com"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/omgdahale/oswald/issues"
+  },
+  "homepage": "https://github.com/omgdahale/oswald#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  }
+}
