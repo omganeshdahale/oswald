@@ -30,6 +30,9 @@ client.on("message", message => {
 	if (command === "ping") {
 		client.commands.get("ping").execute(message, args, client);
 	}
+	else if (command === "invite") {
+		client.commands.get("invite").execute(message, args, Discord, client, config);
+	}
 
 
 });
