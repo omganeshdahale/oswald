@@ -16,6 +16,7 @@ for (const filename of commandFiles) {
 
 client.once("ready", () => {
 	console.log("Oswald is Online!");
+	updateActivity();
 });
 
 client.on("message", message => {
@@ -32,6 +33,15 @@ client.on("message", message => {
 
 
 });
+
+client.on("guildCreate", updateActivity);
+client.on("guildDelete", updateActivity);
+
+function updateActivity() {
+	client.user.setActivity(`+help | ${client.guilds.cache.size} guild(s)`)
+	.then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
+	.catch(console.error);
+}
 
 
 client.login(config.BOT_TOKEN);
