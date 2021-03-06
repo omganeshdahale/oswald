@@ -47,7 +47,7 @@ client.on("message", message => {
 		return;
 	}
 
-	const args = message.content.slice(PREFIX.length).split(" ");
+	const args = message.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
 	if (command === "ping") {
@@ -55,6 +55,9 @@ client.on("message", message => {
 	}
 	else if (command === "invite") {
 		client.commands.get("invite").execute(message, args, Discord, client, config);
+	}
+	else if (command === "prefix") {
+		client.commands.get("prefix").execute(message, args, db, prefixCache);
 	}
 
 
@@ -71,3 +74,15 @@ function updateActivity() {
 
 
 client.login(config.BOT_TOKEN);
+
+process.on("exit", code => {
+	db.close();
+	console.log("disconnected from db './database/main.db'");
+	process.exit();
+});
+process.on("SIGINT", () => {
+	process.exit();
+});
+process.setUncaughtExceptionCaptureCallback(e => {
+	process.exit();
+});
