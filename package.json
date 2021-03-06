@@ -1,5 +1,5 @@
 {
-  "name": "oswald",
+  "name": "oswald-bot",
   "version": "1.0.0",
   "description": "Oswald! A Utility and Moderation Discord Bot.",
   "main": "index.js",
