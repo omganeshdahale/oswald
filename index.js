@@ -1,9 +1,31 @@
 const fs = require("fs");
 const Discord = require("discord.js");
+const sqlite3 = require("sqlite3").verbose();
 const config = require("./config.json");
 
 const PREFIX = "+";
+const db = new sqlite3.Database("./database/main.db", err => {
+	if (err) {
+		return console.error(err);
+	}
+	console.log("connected to db './database/main.db'");
+});
+const prefixCache = {};
 const client = new Discord.Client();
+
+db.serialize(() => {
+	// create config table if not exist
+	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT)");
+	
+	// loading prefix into cache
+	db.each("SELECT * FROM config", [], (err, row) => {
+		if (err) {
+			return console.error(err);
+		}
+		prefixCache[row.serverid] = row.prefix;
+	});
+});
+
 
 client.commands = new Discord.Collection();
 
@@ -20,7 +42,8 @@ client.once("ready", () => {
 });
 
 client.on("message", message => {
-	if (!message.content.startsWith(PREFIX) || message.author.bot) {
+	const prefix = prefixCache[message.guild.id] || PREFIX;
+	if (!message.content.startsWith(prefix) || message.author.bot) {
 		return;
 	}
 
