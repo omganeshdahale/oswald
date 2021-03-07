@@ -62,6 +62,9 @@ client.on("message", message => {
 	else if (command === "clear") {
 		client.commands.get("clear").execute(message, args);
 	}
+	else if (command === "help") {
+		client.commands.get("help").execute(message, args, Discord, client);
+	}
 
 });
 

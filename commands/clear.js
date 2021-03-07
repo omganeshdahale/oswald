@@ -1,6 +1,7 @@
 module.exports = {
 	name: "clear",
 	description: "Clear bulk messages.",
+	usage: "+clear <number x | 0 < x < 100>",
 	execute(message, args) {
 		if (!message.member.hasPermission("MANAGE_MESSAGES")) {
 			return message.reply(":no_entry_sign: You do not have Permission: `MANAGE_MESSAGES`.");

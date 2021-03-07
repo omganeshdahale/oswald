@@ -1,6 +1,7 @@
 module.exports = {
 	name: "prefix",
 	description: "Set custom prefix.",
+	usage: "+prefix <string>",
 	execute(message, args, db, prefixCache) {
 		if (!message.member.hasPermission("MANAGE_GUILD")) {
 			return message.reply(":no_entry_sign: You do not have Permission: `MANAGE_GUILD`.");

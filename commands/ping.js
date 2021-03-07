@@ -1,6 +1,7 @@
 module.exports = {
 	name: "ping",
-	description: "Shows Latency.",
+	description: "Show Latency.",
+	usage: "+ping",
 	execute(message, args, client) {
 		message.channel.send(`API Ping is \`${client.ws.ping}ms\`.`);
 	}

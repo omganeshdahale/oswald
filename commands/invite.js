@@ -1,6 +1,7 @@
 module.exports = {
 	name: "invite",
 	description: "Send Link to Invite Oswald.",
+	usage: "+invite",
 	execute(message, args, Discord, client, config) {
 		const embed = new Discord.MessageEmbed();
 		embed.setColor("#9999FF")
