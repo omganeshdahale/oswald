@@ -2,7 +2,10 @@ module.exports = {
 	name: "prefix",
 	description: "Set custom prefix.",
 	execute(message, args, db, prefixCache) {
-		if (!args.length) {
+		if (!message.member.hasPermission("MANAGE_GUILD")) {
+			return message.reply(":no_entry_sign: You do not have Permission: `MANAGE_GUILD`.");
+		}
+		else if (!args.length) {
 			return message.channel.send("Please provide a prefix.");
 		}
 		const prefix = args[0];
