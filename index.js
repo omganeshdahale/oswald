@@ -42,6 +42,10 @@ client.once("ready", () => {
 });
 
 client.on("message", message => {
+	if (message.channel.type === "dm") {
+		return;
+	}
+
 	const prefix = prefixCache[message.guild.id] || PREFIX;
 	if (!message.content.startsWith(prefix) || message.author.bot) {
 		return;
