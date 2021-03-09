@@ -15,7 +15,7 @@ const client = new Discord.Client();
 
 db.serialize(() => {
 	// create config table if not exist
-	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT)");
+	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT)");
 	
 	// loading prefix into cache
 	db.each("SELECT * FROM config", [], (err, row) => {
@@ -69,6 +69,15 @@ client.on("message", message => {
 	else if (command === "help") {
 		client.commands.get("help").execute(message, args, Discord, client);
 	}
+	else if (command === "muterole") {
+		client.commands.get("muterole").execute(message, args, db);
+	}
+	else if (command === "mute") {
+		client.commands.get("mute").execute(message, args, db);
+	}
+	else if (command === "unmute") {
+		client.commands.get("unmute").execute(message, args, db);
+	}
 
 });
 
@@ -93,5 +102,6 @@ process.on("SIGINT", () => {
 	process.exit();
 });
 process.setUncaughtExceptionCaptureCallback(e => {
+	console.error(e);
 	process.exit();
 });
