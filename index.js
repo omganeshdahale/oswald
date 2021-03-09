@@ -78,6 +78,9 @@ client.on("message", message => {
 	else if (command === "unmute") {
 		client.commands.get("unmute").execute(message, args, db);
 	}
+	else if (command === "kick") {
+		client.commands.get("kick").execute(message, args);
+	}
 
 });
 
