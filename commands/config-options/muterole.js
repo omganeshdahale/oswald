@@ -1,13 +1,13 @@
 module.exports = {
 	name: "muterole",
 	description: "Set mute role.",
-	usage: "+muterole <mention role>",
+	usage: "+config muterole <mention role>",
 	execute(message, args, db) {
 		if (!message.member.hasPermission("MANAGE_ROLES")) {
 			return message.reply(":no_entry_sign: You do not have Permission: `MANAGE_ROLES`.");
 		}
 		else if (!message.mentions.roles.size) {
-			return message.channel.send("Please Mention a Role as argument.");
+			return message.channel.send("Please Mention a Role as option argument.");
 		}
 
 		const muteRoleId = message.mentions.roles.first().id;

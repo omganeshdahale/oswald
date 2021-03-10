@@ -60,17 +60,11 @@ client.on("message", message => {
 	else if (command === "invite") {
 		client.commands.get("invite").execute(message, args, Discord, client, config);
 	}
-	else if (command === "prefix") {
-		client.commands.get("prefix").execute(message, args, db, prefixCache);
-	}
 	else if (command === "clear") {
 		client.commands.get("clear").execute(message, args);
 	}
 	else if (command === "help") {
 		client.commands.get("help").execute(message, args, Discord, client);
-	}
-	else if (command === "muterole") {
-		client.commands.get("muterole").execute(message, args, db);
 	}
 	else if (command === "mute") {
 		client.commands.get("mute").execute(message, args, db);
@@ -83,6 +77,9 @@ client.on("message", message => {
 	}
 	else if (command === "ban") {
 		client.commands.get("ban").execute(message, args);
+	}
+	else if (command === "config") {
+		client.commands.get("config").execute(message, args, db, prefixCache);
 	}
 
 });
