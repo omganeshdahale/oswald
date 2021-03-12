@@ -4,6 +4,8 @@ const sqlite3 = require("sqlite3").verbose();
 const config = require("./config.json");
 
 const PREFIX = "+";
+const JOIN_MSG = "$user joined the server!";
+
 const db = new sqlite3.Database("./database/main.db", err => {
 	if (err) {
 		return console.error(err);
@@ -15,7 +17,7 @@ const client = new Discord.Client();
 
 db.serialize(() => {
 	// create config table if not exist
-	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT)");
+	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT, doJoinMsg TEXT, joinMsgChannelId TEXT, joinMsg TEXT)");
 	
 	// loading prefix into cache
 	db.each("SELECT * FROM config", [], (err, row) => {
@@ -39,6 +41,22 @@ for (const filename of commandFiles) {
 client.once("ready", () => {
 	console.log("Oswald is Online!");
 	updateActivity();
+});
+
+client.on("guildMemberAdd", member => {
+	db.get("SELECT doJoinMsg, joinMsgChannelId, joinMsg FROM config WHERE serverid = ?", [member.guild.id], (err, row) => {
+		if (err) {
+			return console.error(err);
+		}
+		else if (row && row.doJoinMsg === "on") {
+			const channel = member.guild.channels.cache.get(row.joinMsgChannelId);
+			if (channel) {
+				let msg = row.joinMsg || JOIN_MSG;
+				msg = msg.replace(/\$user/g, `<@${member.user.id}>`);
+				channel.send(msg).catch(console.error);
+			}
+		}
+	});
 });
 
 client.on("message", message => {

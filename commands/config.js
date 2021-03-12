@@ -10,13 +10,13 @@ for (const filename of optionFiles) {
 
 let desc = "Configure bot.\nAvailable options:\n\n";
 for (const key in options) {
-	desc += `:link: **${options[key].name}**:\n- _${options[key].description}_\n- \`${options[key].usage}\`\n\n`
+	desc += `:link: **${options[key].name}**:\n- *${options[key].description}*\n- \`${options[key].usage}\`\n\n`
 }
 
 module.exports = {
 	name: "config",
 	description: desc,
-	usage: "+config <option> <value>",
+	usage: "+config <option> ...<value>",
 	execute(message, args, db, prefixCache) {
 		if (!args.length) {
 			return message.channel.send("Please provide an Option.");
@@ -29,6 +29,9 @@ module.exports = {
 		}
 		else if (option === "muterole") {
 			options["muterole"].execute(message, args, db);
+		}
+		else if (option === "joinmsg") {
+			options["joinmsg"].execute(message, args, db);
 		}
 		else {
 			message.channel.send(`No such option: \`${option}\`.`)
