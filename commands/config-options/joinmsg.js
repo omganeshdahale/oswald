@@ -16,7 +16,7 @@ module.exports = {
 		let doJoinMsg = args.shift();
 		let channelId = message.channel.id;
 
-		db.get("SELECT serverid, joinMsg FROM config WHERE serverid = ?", [message.guild.id], (err, row) => {
+		db.get("SELECT joinMsg FROM config WHERE serverid = ?", [message.guild.id], (err, row) => {
 			if (err) {
 				return console.error(err);
 			}

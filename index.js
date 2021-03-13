@@ -17,7 +17,7 @@ const client = new Discord.Client();
 
 db.serialize(() => {
 	// create config table if not exist
-	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT, doJoinMsg TEXT, joinMsgChannelId TEXT, joinMsg TEXT)");
+	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT, doJoinMsg TEXT, joinMsgChannelId TEXT, joinMsg TEXT, doJoinRole TEXT, joinRoleId TEXT)");
 	
 	// loading prefix into cache
 	db.each("SELECT * FROM config", [], (err, row) => {
@@ -44,16 +44,24 @@ client.once("ready", () => {
 });
 
 client.on("guildMemberAdd", member => {
-	db.get("SELECT doJoinMsg, joinMsgChannelId, joinMsg FROM config WHERE serverid = ?", [member.guild.id], (err, row) => {
+	db.get("SELECT doJoinMsg, joinMsgChannelId, joinMsg, doJoinRole, joinRoleId FROM config WHERE serverid = ?", [member.guild.id], (err, row) => {
 		if (err) {
 			return console.error(err);
 		}
-		else if (row && row.doJoinMsg === "on") {
-			const channel = member.guild.channels.cache.get(row.joinMsgChannelId);
-			if (channel) {
-				let msg = row.joinMsg || JOIN_MSG;
-				msg = msg.replace(/\$user/g, `<@${member.user.id}>`);
-				channel.send(msg).catch(console.error);
+		else if (row) {
+			if (row.doJoinMsg === "on") {
+				const channel = member.guild.channels.cache.get(row.joinMsgChannelId);
+				if (channel) {
+					let msg = row.joinMsg || JOIN_MSG;
+					msg = msg.replace(/\$user/g, `<@${member.user.id}>`);
+					channel.send(msg).catch(console.error);
+				}
+			}
+			if (row.doJoinRole === "on") {
+				const role = member.guild.roles.cache.get(row.joinRoleId);
+				if (role) {
+					member.roles.add(role).catch(console.error);
+				}
 			}
 		}
 	});
