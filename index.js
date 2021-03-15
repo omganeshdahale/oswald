@@ -17,7 +17,7 @@ const client = new Discord.Client();
 
 db.serialize(() => {
 	// create config table if not exist
-	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT, doJoinMsg TEXT, joinMsgChannelId TEXT, joinMsg TEXT, doJoinRole TEXT, joinRoleId TEXT)");
+	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT, doJoinMsg TEXT, joinMsgChannelId TEXT, joinMsg TEXT, doJoinRole TEXT, joinRoleId TEXT, doLogs TEXT, logsChannelId TEXT)");
 	
 	// loading prefix into cache
 	db.each("SELECT * FROM config", [], (err, row) => {
@@ -44,7 +44,7 @@ client.once("ready", () => {
 });
 
 client.on("guildMemberAdd", member => {
-	db.get("SELECT doJoinMsg, joinMsgChannelId, joinMsg, doJoinRole, joinRoleId FROM config WHERE serverid = ?", [member.guild.id], (err, row) => {
+	db.get("SELECT doJoinMsg, joinMsgChannelId, joinMsg, doJoinRole, joinRoleId, doLogs, logsChannelId FROM config WHERE serverid = ?", [member.guild.id], (err, row) => {
 		if (err) {
 			return console.error(err);
 		}
@@ -61,6 +61,23 @@ client.on("guildMemberAdd", member => {
 				const role = member.guild.roles.cache.get(row.joinRoleId);
 				if (role) {
 					member.roles.add(role).catch(console.error);
+				}
+			}
+			if (row.doLogs === "on") {
+				const channel = member.guild.channels.cache.get(row.logsChannelId);
+				if (channel) {
+					const date = member.user.createdAt;
+					const embed = new Discord.MessageEmbed();
+					embed.setColor("#009A49")
+					.setThumbnail(member.user.displayAvatarURL())
+					.setTitle("Member Joined")
+					.setDescription(member.user.tag)
+					.addFields(
+						{name: "Account Created on", value: `(UTC DD/MM/YYYY)\n${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()}`},
+						{name: "Bot Account", value: member.user.bot}
+					);
+					
+					channel.send(embed).catch(console.error);
 				}
 			}
 		}
@@ -93,16 +110,16 @@ client.on("message", message => {
 		client.commands.get("help").execute(message, args, Discord, client);
 	}
 	else if (command === "mute") {
-		client.commands.get("mute").execute(message, args, db);
+		client.commands.get("mute").execute(message, args, Discord, client, db);
 	}
 	else if (command === "unmute") {
-		client.commands.get("unmute").execute(message, args, db);
+		client.commands.get("unmute").execute(message, args, Discord, db);
 	}
 	else if (command === "kick") {
-		client.commands.get("kick").execute(message, args);
+		client.commands.get("kick").execute(message, args, Discord, db);
 	}
 	else if (command === "ban") {
-		client.commands.get("ban").execute(message, args);
+		client.commands.get("ban").execute(message, args, Discord, db);
 	}
 	else if (command === "config") {
 		client.commands.get("config").execute(message, args, db, prefixCache);

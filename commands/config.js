@@ -36,6 +36,9 @@ module.exports = {
 		else if (option === "joinrole") {
 			options["joinrole"].execute(message, args, db);
 		}
+		else if (option === "oswaldlogs") {
+			options["oswaldlogs"].execute(message, args, db);
+		}
 		else {
 			message.channel.send(`No such option: \`${option}\`.`)
 		}
