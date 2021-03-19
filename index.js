@@ -16,9 +16,10 @@ const prefixCache = {};
 const client = new Discord.Client();
 
 db.serialize(() => {
-	// create config table if not exist
+	// create table if not exist
 	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT, doJoinMsg TEXT, joinMsgChannelId TEXT, joinMsg TEXT, doJoinRole TEXT, joinRoleId TEXT, doLogs TEXT, logsChannelId TEXT)");
-	
+	db.run("CREATE TABLE IF NOT EXISTS warning(serverid TEXT NOT NULL, userid TEXT NOT NULL, warnings TEXT)");
+
 	// loading prefix into cache
 	db.each("SELECT * FROM config", [], (err, row) => {
 		if (err) {
@@ -123,6 +124,9 @@ client.on("message", message => {
 	}
 	else if (command === "config") {
 		client.commands.get("config").execute(message, args, db, prefixCache);
+	}
+	else if (command === "warn") {
+		client.commands.get("warn").execute(message, args, Discord, db);
 	}
 
 });
