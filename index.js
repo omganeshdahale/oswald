@@ -4,6 +4,8 @@ const sqlite3 = require("sqlite3").verbose();
 const config = require("./config.json");
 
 const PREFIX = "+";
+const JOIN_MSG = "$user joined the server!";
+
 const db = new sqlite3.Database("./database/main.db", err => {
 	if (err) {
 		return console.error(err);
@@ -14,9 +16,10 @@ const prefixCache = {};
 const client = new Discord.Client();
 
 db.serialize(() => {
-	// create config table if not exist
-	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT)");
-	
+	// create table if not exist
+	db.run("CREATE TABLE IF NOT EXISTS config(serverid TEXT NOT NULL, prefix TEXT, muteRoleId TEXT, doJoinMsg TEXT, joinMsgChannelId TEXT, joinMsg TEXT, doJoinRole TEXT, joinRoleId TEXT, doLogs TEXT, logsChannelId TEXT)");
+	db.run("CREATE TABLE IF NOT EXISTS warning(serverid TEXT NOT NULL, userid TEXT NOT NULL, warnings TEXT)");
+
 	// loading prefix into cache
 	db.each("SELECT * FROM config", [], (err, row) => {
 		if (err) {
@@ -41,7 +44,52 @@ client.once("ready", () => {
 	updateActivity();
 });
 
+client.on("guildMemberAdd", member => {
+	db.get("SELECT doJoinMsg, joinMsgChannelId, joinMsg, doJoinRole, joinRoleId, doLogs, logsChannelId FROM config WHERE serverid = ?", [member.guild.id], (err, row) => {
+		if (err) {
+			return console.error(err);
+		}
+		else if (row) {
+			if (row.doJoinMsg === "on") {
+				const channel = member.guild.channels.cache.get(row.joinMsgChannelId);
+				if (channel) {
+					let msg = row.joinMsg || JOIN_MSG;
+					msg = msg.replace(/\$user/g, `<@${member.user.id}>`);
+					channel.send(msg).catch(console.error);
+				}
+			}
+			if (row.doJoinRole === "on") {
+				const role = member.guild.roles.cache.get(row.joinRoleId);
+				if (role) {
+					member.roles.add(role).catch(console.error);
+				}
+			}
+			if (row.doLogs === "on") {
+				const channel = member.guild.channels.cache.get(row.logsChannelId);
+				if (channel) {
+					const date = member.user.createdAt;
+					const embed = new Discord.MessageEmbed();
+					embed.setColor("#009A49")
+					.setThumbnail(member.user.displayAvatarURL())
+					.setTitle("Member Joined")
+					.setDescription(member.user.tag)
+					.addFields(
+						{name: "Account Created on", value: `(UTC DD/MM/YYYY)\n${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()}`},
+						{name: "Bot Account", value: member.user.bot}
+					);
+					
+					channel.send(embed).catch(console.error);
+				}
+			}
+		}
+	});
+});
+
 client.on("message", message => {
+	if (message.channel.type === "dm") {
+		return;
+	}
+
 	const prefix = prefixCache[message.guild.id] || PREFIX;
 	if (!message.content.startsWith(prefix) || message.author.bot) {
 		return;
@@ -56,14 +104,35 @@ client.on("message", message => {
 	else if (command === "invite") {
 		client.commands.get("invite").execute(message, args, Discord, client, config);
 	}
-	else if (command === "prefix") {
-		client.commands.get("prefix").execute(message, args, db, prefixCache);
-	}
 	else if (command === "clear") {
 		client.commands.get("clear").execute(message, args);
 	}
 	else if (command === "help") {
 		client.commands.get("help").execute(message, args, Discord, client);
+	}
+	else if (command === "mute") {
+		client.commands.get("mute").execute(message, args, Discord, client, db);
+	}
+	else if (command === "unmute") {
+		client.commands.get("unmute").execute(message, args, Discord, db);
+	}
+	else if (command === "kick") {
+		client.commands.get("kick").execute(message, args, Discord, db);
+	}
+	else if (command === "ban") {
+		client.commands.get("ban").execute(message, args, Discord, db);
+	}
+	else if (command === "config") {
+		client.commands.get("config").execute(message, args, db, prefixCache);
+	}
+	else if (command === "warn") {
+		client.commands.get("warn").execute(message, args, Discord, db);
+	}
+	else if (command === "warnings") {
+		client.commands.get("warnings").execute(message, args, Discord, db);
+	}
+	else if (command === "clearwarn") {
+		client.commands.get("clearwarn").execute(message, args, db);
 	}
 
 });
@@ -89,5 +158,6 @@ process.on("SIGINT", () => {
 	process.exit();
 });
 process.setUncaughtExceptionCaptureCallback(e => {
+	console.error(e);
 	process.exit();
 });
