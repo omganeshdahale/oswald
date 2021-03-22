@@ -19,7 +19,7 @@ module.exports = {
 					.setAuthor(member.user.username, member.user.displayAvatarURL())
 					.setDescription(`${member.user.tag}'s Warnings`);
 
-					if (row.warnings) {
+					if (JSON.parse(row.warnings).length) {
 						for (i of JSON.parse(row.warnings)) {
 							let title = new Date(i.timestamp);
 							title = `\`${title.getUTCDate()}/${title.getUTCMonth()+1}/${title.getUTCFullYear()} ${title.getUTCHours()}:${title.getUTCMinutes()}\``;
