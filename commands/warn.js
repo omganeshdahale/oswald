@@ -27,7 +27,8 @@ module.exports = {
 			else if (row) {
 				const warnings = JSON.parse(row.warnings);
 				const warning = {
-					authorid: message.member.user.id,
+					authorTag: message.member.user.tag,
+					timestamp: Date.now(),
 					reason
 				}
 				warnings.push(warning);
@@ -42,7 +43,8 @@ module.exports = {
 			}
 			const warnings = [];
 			const warning = {
-				authorid: message.member.user.id,
+				authorTag: message.member.user.tag,
+				timestamp: Date.now(),
 				reason
 			}
 			warnings.push(warning);

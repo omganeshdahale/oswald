@@ -128,6 +128,9 @@ client.on("message", message => {
 	else if (command === "warn") {
 		client.commands.get("warn").execute(message, args, Discord, db);
 	}
+	else if (command === "warnings") {
+		client.commands.get("warnings").execute(message, args, Discord, db);
+	}
 
 });
 
