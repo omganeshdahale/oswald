@@ -41,15 +41,7 @@ module.exports = {
 								}
 								if (row) {
 									if (row.doLogs === "on") {
-										const channel = message.member.guild.channels.cache.get(row.logsChannelId);
-										if (channel) {
-											const embed = new Discord.MessageEmbed();
-											embed.setColor("#46B67B")
-											.setAuthor(member.user.username, member.user.displayAvatarURL())
-											.setDescription(`${member.user.tag} is **Unmuted**\nBy **${client.user.tag}**.`);
-											
-											channel.send(embed).catch(console.error);
-										}
+										log(message, member, row, Discord, "#46B67B", `${member.user.tag} is **Unmuted**\nBy **${client.user.tag}**.`);
 									}
 								}
 							});
@@ -63,15 +55,7 @@ module.exports = {
 							}
 							if (row) {
 								if (row.doLogs === "on") {
-									const channel = message.member.guild.channels.cache.get(row.logsChannelId);
-									if (channel) {
-										const embed = new Discord.MessageEmbed();
-										embed.setColor("#FFA500")
-										.setAuthor(member.user.username, member.user.displayAvatarURL())
-										.setDescription(`${member.user.tag} is **Muted** for \`${args[args.length-1]}\`\nBy **${message.member.user.tag}**.`);
-										
-										channel.send(embed).catch(console.error);
-									}
+									log(message, member, row, Discord, "#FFA500", `${member.user.tag} is **Muted** for \`${args[args.length-1]}\`\nBy **${message.member.user.tag}**.`);
 								}
 							}
 						});
@@ -86,15 +70,7 @@ module.exports = {
 					}
 					if (row) {
 						if (row.doLogs === "on") {
-							const channel = message.member.guild.channels.cache.get(row.logsChannelId);
-							if (channel) {
-								const embed = new Discord.MessageEmbed();
-								embed.setColor("#FFA500")
-								.setAuthor(member.user.username, member.user.displayAvatarURL())
-								.setDescription(`${member.user.tag} is **Muted**\nBy **${message.member.user.tag}**.`);
-								
-								channel.send(embed).catch(console.error);
-							}
+							log(message, member, row, Discord, "#FFA500", `${member.user.tag} is **Muted**\nBy **${message.member.user.tag}**.`);
 						}
 					}
 				});
@@ -124,4 +100,16 @@ function toMs(str) {
 	else {
 		return null;
 	}
+}
+
+function log(message, member, row, Discord, color, desc) {
+	const channel = message.member.guild.channels.cache.get(row.logsChannelId);
+		if (channel) {
+			const embed = new Discord.MessageEmbed();
+			embed.setColor(color)
+			.setAuthor(member.user.username, member.user.displayAvatarURL())
+			.setDescription(desc);
+			
+			channel.send(embed).catch(console.error);
+		}
 }
