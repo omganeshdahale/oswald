@@ -16,6 +16,11 @@ module.exports = {
 		}
 
 		db.get("SELECT muteRoleId FROM config WHERE serverid = ?", [message.guild.id], (err, row) => {
+			if (!row) {
+				message.channel.send("Mute Role not configured.");
+				return;
+			}
+
 			const muteRoleId = row.muteRoleId;
 			if (!muteRoleId) {
 				message.channel.send("Mute Role not configured.");

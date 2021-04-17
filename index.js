@@ -6,11 +6,16 @@ const config = require("./config.json");
 const PREFIX = "+";
 const JOIN_MSG = "$user joined the server!";
 
-const db = new sqlite3.Database("./database/main.db", err => {
+// create db file if not exist
+if (!fs.existsSync("db.sqlite3")) {
+	fs.writeFileSync("db.sqlite3", "");
+}
+
+const db = new sqlite3.Database("db.sqlite3", err => {
 	if (err) {
 		return console.error(err);
 	}
-	console.log("connected to db './database/main.db'");
+	console.log("connected to db 'db.sqlite3'");
 });
 const prefixCache = {};
 const client = new Discord.Client();
@@ -151,7 +156,7 @@ client.login(config.BOT_TOKEN);
 
 process.on("exit", code => {
 	db.close();
-	console.log("disconnected from db './database/main.db'");
+	console.log("disconnected from db 'db.sqlite3'");
 	process.exit();
 });
 process.on("SIGINT", () => {
